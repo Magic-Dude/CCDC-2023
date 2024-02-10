@@ -1,0 +1,138 @@
+Windows hardening checklist
+Can run script before step 1 if do readme, forensics, and updates first. Follow the order of operations.
+
+**You can update after script if you're trying to stagger, but you need to complete subtext "b" on step 10 first.
+
+Before anything- implement "SecSettingsFinal.inf" by going to Group Policy Editor, and navigating to "Computer Configuration>Policies>Windows Settings"
+right-click "security Settings" and hit "import." Import "SecSettingsFinal.inf." This sets up your password policies, etc
+
+1. User management-
+	a.delete any users not in readme:
+		-Launch "Control Panel", follow path ControlPanel>UserAccounts>ManageAccount
+		-cycle through accounts in list that are not needed, clicking account name then "Delete the User"
+	b.add any users from readme that aren't already on system:
+		-Launch "Settings" go to path Accounts>Family&OtherUsers>AddSomeoneElseToThisPC
+		-Go through user configuration "I don't have this person's sign-in info">"Add a user without a Microsoft account">*Enter user info*
+	c.alter user roles as needed:
+		-from cmd run "mmc"
+		-from mmc, go file>Add/RemoveSnap-In>AvailableSnap-Ins>LocalUsersAndGroups>ok
+		-select "groups", verify users have the role assigned in the readme
+	d.alter user properties as needed:
+		-from mmc, click "users", then right click accounts to be changed. Click "properties", then follow below conventions
+			~none checked
+
+		
+2. set up group policies
+	a. review the readme for any groups that need to be created
+	b. access the groups menu from the mmc, make sure all users are in the correct groups specified in the readme
+		-add or remove users from groups by clicking on the group name
+	c.cross-reference default groupt list (Exhibit 1, bottom of doc) with list in groups menu. 
+		-review and possibly remove any groups that are not default or specified in the readme by right-clicking and clicking "delete"
+		-add groups if needed by right-clicking on blank space in groups menu and clicking "new group"
+
+3. enable windows notificatione
+	a. Launch "Windows Action Center" (Win+A) 
+	b. click "Manage Notifications". Turn on all notifications. (They're on if you can't do this.)
+
+4. configure User Access Control
+	a. Launch "UserAccountControlSettings", (Searchable in settings) 
+	b. on left-hand side, raise bar to "Always Notify".
+
+
+5. software to be installed and configured
+	a. MalwareBytes
+	b. Avast AntiRootkit
+	c. use "Everything" from "voidtools.com" to search for files from "SuspiciousFiles" directory
+	d. use "Revo Uninstaller" from "www.revouninstaller.com" to thoroughly remove anything other than CyberPatriot items not EXPLICITLY required in readme. (Use advanced remove for anything inherently malicious)
+
+6. Process check
+	a. run "netstat -anb 5"('o' apendage will show PID) and check for unusual output//port numbers. Double-check listening ports are req'd. (MAKE SURE YOU STOP PROCESS AND BLOCK PORT IN FIREWALL)
+	b. run "tasklist", same process.
+	c. "netstat" -ano -p *protocolname* 5" can search tasks by protocol, can be used in conjunction with readme data
+	d. you can use the task manager to sort tasks by memory usage
+	e. use "www.processlibrary.com" to determine if processes are legitimate.
+
+7. Patch management/misc
+	a. use the tool found at "ninite.com" to manage patches for selected programs
+	b. run "sfc /scannow" from cmd to check for bad windows files	
+
+8. Configure internet options
+	a. search "Internet Options" and start
+	b. navigate to "Advanced" tab. Click "Reset" under "Reset Internet Explorer settings"
+	c. navigate to "Security" tab. Set slider to highest security level for all zones
+	d. navigate to "Privacy" tab. Check all boxes, make sure there aren't any exceptions by clicking "advanced" or "settings"
+	e. navigate to "Connections" tab, click "LAN Settings". Make sure there is no proxy or automatic configuration scripts being used. Check "Automatically detect settings"
+	f. Check settings of required browsers on system other than internet explorer. (Use firefor about:config)
+
+
+9. configure file settings
+	a. search and launch "folder options", go to "view" tab
+	b.  Show hidden files, folders, and drives should be checked and Hide extensions for known file types should be unchecked... this can help with cleanup if points are still missing
+	c. remove unwanted file types from system
+
+10. misc
+	a. review task scheduler
+	b. check for scripts that run on boot. 
+		-run Gpedit.msc>Computer Configuration\Windows Settings\Scripts and check for scripts
+	c. check known network connections/adapters
+	d. check firewall exceptions
+	e. check certs through certmgr.msc
+	
+
+11. final misc 
+	a. update machine
+	b. install microsoft service packs. Can be found through google.
+		
+		
+
+Notes/If Stuck:
+		
+-If lost, cross-reference categories you've earned points in with vulnerability categories from previous seasons to form an idea of what you're missing. Adam can get them for you.
+-Look at resource usage in task manager
+-make sure no accounts are "password never expires"
+-check ipsec policies
+-check for an applocker config
+
+Exhibit 1-
+-Administrators
+-Backup Operators
+-Cryptographic Operators
+-Distributed COM users
+-Event Log Readers
+-Guests
+-IIS_IUSRS
+-Network Configuration
+-Performance Log Users
+-Performance Monitor Users
+-Power Users
+-Remote Desktop Users
+-Replicator
+-System Managed Accounts
+-Users
+
+
+###################################################################
+Server-exclusives:
+
+1. Review port (firewall) configurations if specified by the readme
+
+2. Configure logging
+
+3. Disable unnecessary services-
+	a. go to path "ControlPanel>AdministrativeTools>Services", right click to disable
+		-Disable the following
+			~IIS
+			~NetMeeting Remote Desktop Sharing – VoIP
+			~Remote Desktop Help Session Manager
+			~Remote Registry
+			~Routing and Remote Access
+			~Simple File Sharing
+			~SSD Discovery Service
+			~Telnet
+			~FTP
+			~Universal Plug and Play Device Host
+			~Windows Messenger Service
+			
+Server Notes:
+-If all else fails, refer to UT@Austin's server checklist @ https://security.utexas.edu/os-hardening-checklist/windows-2016\
+-DNS Security- https://newhelptech.wordpress.com/2017/07/02/step-by-step-implementing-dns-security-in-windows-server-2016/

@@ -1,0 +1,25 @@
+#!/bin/bash
+
+DATE_GRAB="Access_log_$(date '+%H:%M').log"
+
+# Authentication attempts log (from /var/log/auth.log)
+echo "=== Authentication Attempts ===" >> $DATE_GRAB
+sudo cat /var/log/auth.log | grep -E 'sshd|login' | tail -n 10 >> $DATE_GRAB
+
+# Active users (using the 'last' command)
+echo -e "\n=== Users That Have Logged In Before===" >> $DATE_GRAB
+last | grep -v "Never logged in" | awk '{print $1}' | sort -u >> $DATE_GRAB
+
+# Last login times for all users (using 'lastlog')
+echo -e "\n=== Last Login Times ===" >> $DATE_GRAB
+lastlog | grep -v "Never logged in" >> $DATE_GRAB
+
+#Current active connections
+echo -e "\n=== Current Connected Users ===" >> $DATE_GRAB
+w >> $DATE_GRAB
+
+# Additional checks (you can customize this section):
+# - Check failed login attempts (e.g., using Fail2Ban)
+# - Monitor other relevant logs (e.g., /var/log/secure)
+
+# End of script
